@@ -1,4 +1,7 @@
-import { classifyProviderError, isRetryableProviderError } from "@cline/llms";
+import {
+	classifyProviderError,
+	isRetryableProviderError,
+} from "@cline/llms/error-classification-browser";
 import type {
 	AgentAfterToolResult,
 	AgentBeforeModelResult,

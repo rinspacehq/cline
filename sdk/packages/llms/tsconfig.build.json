@@ -12,6 +12,7 @@
 	"include": [
 		"src/index.ts",
 		"src/index.browser.ts",
+		"src/error-classification.browser.ts",
 		"src/models.ts",
 		"src/providers.ts",
 		"src/providers.browser.ts"
