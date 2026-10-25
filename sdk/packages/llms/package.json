@@ -24,6 +24,11 @@
 		"./browser": {
 			"import": "./dist/index.browser.js",
 			"types": "./dist/index.browser.d.ts"
+		},
+		"./error-classification-browser": {
+			"browser": "./dist/error-classification-browser.js",
+			"import": "./dist/error-classification-browser.js",
+			"types": "./dist/error-classification-browser.d.ts"
 		}
 	},
 	"files": [

@@ -17,6 +17,11 @@
 			"browser": "./dist/index.js",
 			"types": "./dist/index.d.ts",
 			"import": "./dist/index.js"
+		},
+		"./browser-host": {
+			"browser": "./dist/browser-host.js",
+			"types": "./dist/browser-host.d.ts",
+			"import": "./dist/browser-host.js"
 		}
 	},
 	"description": "Browser-safe agent runtime for the next-generation Cline SDK",

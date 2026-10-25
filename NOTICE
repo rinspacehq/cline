@@ -1,0 +1,11 @@
+Rinspace Cline fork
+Copyright 2026 Rinspace contributors
+
+This repository is a derivative of Cline (https://github.com/cline/cline),
+Copyright Cline Bot Inc. and Cline contributors, licensed under the Apache
+License, Version 2.0.
+
+The Rinspace product branch starts from upstream commit
+c718573538d76310f464541617ab665108a6c999, tagged sdk/agents/v0.0.95. The
+upstream baseline does not contain a root NOTICE file; this derivative NOTICE
+records provenance and does not alter the upstream LICENSE or copyright terms.

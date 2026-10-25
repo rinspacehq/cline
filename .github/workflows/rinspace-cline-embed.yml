@@ -1,0 +1,163 @@
+name: rinspace-cline-embed
+
+on:
+  pull_request:
+    branches:
+      - rinspace-sdk
+    paths:
+      - "sdk/packages/agents/**"
+      - "sdk/packages/cline-embed/**"
+      - "sdk/packages/ui/**"
+      - "sdk/biome.json"
+      - "scripts/rinspace/**"
+      - "NOTICE"
+      - "LICENSE"
+      - "bun.lock"
+      - ".github/workflows/rinspace-cline-embed.yml"
+      - ".github/workflows/rinspace-cline-embed-release.yml"
+  push:
+    branches:
+      - rinspace-sdk
+    paths:
+      - "sdk/packages/agents/**"
+      - "sdk/packages/cline-embed/**"
+      - "sdk/packages/ui/**"
+      - "sdk/biome.json"
+      - "scripts/rinspace/**"
+      - "NOTICE"
+      - "LICENSE"
+      - "bun.lock"
+      - ".github/workflows/rinspace-cline-embed.yml"
+      - ".github/workflows/rinspace-cline-embed-release.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rinspace-cline-embed-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cline-embed:
+    name: cline-embed
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.2"
+      - name: Install exact workspace dependencies
+        run: bun install --frozen-lockfile
+      - name: Check changed SDK source style
+        run: |
+          bunx --bun @biomejs/biome check --diagnostic-level=error \
+            sdk/packages/agents/src/agent-runtime.ts \
+            sdk/packages/agents/src/browser-host.ts \
+            sdk/packages/agents/src/hosted-agent-runtime.ts \
+            sdk/packages/cline-embed/src \
+            sdk/packages/cline-embed/tests \
+            sdk/packages/cline-embed/examples \
+            sdk/packages/llms/src/error-classification-browser.ts \
+            sdk/packages/llms/src/providers/error-classification.browser.ts \
+            sdk/packages/llms/src/providers/error-classification.browser.test.ts \
+            scripts/rinspace
+      - name: Build browser-hosted runtime and selected UI
+        run: |
+          bun -F @cline/shared build
+          bun -F @cline/llms build
+          bun -F @cline/agents build
+          bun -F @cline/ui build
+          bun -F @rinspacehq/cline-embed build
+      - name: Typecheck focused packages
+        run: |
+          bun -F @cline/agents typecheck
+          bun -F @rinspacehq/cline-embed typecheck
+      - name: Run focused tests serially
+        run: |
+          bun -F @cline/llms test -- src/providers/error-classification.browser.test.ts
+          bun -F @cline/agents test
+          bun -F @rinspacehq/cline-embed test
+      - name: Run minimal example in Chromium
+        run: |
+          mkdir -p "$RUNNER_TEMP/cline-embed-example"
+          bun build sdk/packages/cline-embed/examples/minimal.tsx \
+            --target browser \
+            --outfile "$RUNNER_TEMP/cline-embed-example/minimal.js"
+          cp sdk/packages/cline-embed/examples/index.html "$RUNNER_TEMP/cline-embed-example/"
+          cp sdk/packages/cline-embed/styles.css "$RUNNER_TEMP/cline-embed-example/"
+          (cd sdk/packages/cline-embed && bunx playwright install chromium)
+          python3 -m http.server 4173 \
+            --bind 127.0.0.1 \
+            --directory "$RUNNER_TEMP/cline-embed-example" &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          for attempt in 1 2 3 4 5; do
+            if curl --fail --silent http://127.0.0.1:4173/ >/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          bun sdk/packages/cline-embed/examples/minimal.e2e.mjs \
+            http://127.0.0.1:4173/
+      - name: Pack and inspect browser artifact
+        run: |
+          export SOURCE_DATE_EPOCH=$(git show -s --format=%ct HEAD)
+          mkdir -p "$RUNNER_TEMP/pack-a" "$RUNNER_TEMP/pack-b" "$RUNNER_TEMP/release"
+          (cd sdk/packages/cline-embed && bun pm pack --destination "$RUNNER_TEMP/pack-a")
+          (cd sdk/packages/cline-embed && bun pm pack --destination "$RUNNER_TEMP/pack-b")
+          cmp "$RUNNER_TEMP"/pack-a/*.tgz "$RUNNER_TEMP"/pack-b/*.tgz
+          cp "$RUNNER_TEMP"/pack-a/*.tgz "$RUNNER_TEMP/release/cline-embed-v0.1.0-rinspace.1.tgz"
+          git archive --format=tar.gz --prefix="cline-v0.1.0-rinspace.1/" \
+            --output="$RUNNER_TEMP/release/cline-v0.1.0-rinspace.1-source.tar.gz" HEAD
+          cp LICENSE NOTICE "$RUNNER_TEMP/release/"
+          node scripts/rinspace/package-cline-embed-release.mjs \
+            --output "$RUNNER_TEMP/release" \
+            --package "$RUNNER_TEMP/release/cline-embed-v0.1.0-rinspace.1.tgz" \
+            --source "$RUNNER_TEMP/release/cline-v0.1.0-rinspace.1-source.tar.gz" \
+            --tag v0.1.0-rinspace.1
+          (cd "$RUNNER_TEMP/release" && sha256sum --check SHA256SUMS)
+          tar -tzf "$RUNNER_TEMP/release/cline-embed-v0.1.0-rinspace.1.tgz" | sort
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cline-embed-release-candidate
+          path: ${{ runner.temp }}/release/*
+          if-no-files-found: error
+          retention-days: 7
+
+  DCO:
+    name: DCO
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Require Signed-off-by on every pull-request commit
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          status=0
+          while read -r commit; do
+            if ! git show -s --format=%B "$commit" | grep -qi '^Signed-off-by: .\+ <.\+>$'; then
+              echo "Missing Signed-off-by trailer: $commit"
+              status=1
+            fi
+          done < <(git rev-list --no-merges "$BASE_SHA..$HEAD_SHA")
+          exit "$status"
+
+  secret-scan:
+    name: secret-scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: node scripts/rinspace/scan-sensitive-inputs.mjs
