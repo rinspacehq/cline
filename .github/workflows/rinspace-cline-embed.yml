@@ -59,7 +59,7 @@ jobs:
             sdk/packages/cline-embed/src \
             sdk/packages/cline-embed/tests \
             sdk/packages/cline-embed/examples \
-            sdk/packages/llms/src/error-classification.browser.ts \
+            sdk/packages/llms/src/error-classification-browser.ts \
             sdk/packages/llms/src/providers/error-classification.browser.ts \
             sdk/packages/llms/src/providers/error-classification.browser.test.ts \
             scripts/rinspace
