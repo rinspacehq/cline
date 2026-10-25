@@ -2,7 +2,7 @@ import {
 	AgentApprovalCard as ClineApprovalCard,
 	AgentChangedFile as ClineChangedFile,
 	AgentChangesPanel as ClineChangesPanel,
-} from "../../ui/components/index";
+} from "@cline/ui";
 import {
 	Conversation,
 	ConversationContent,
@@ -13,7 +13,7 @@ import {
 	ToolActivityContent,
 	ToolActivityTrigger,
 	type ToolActivityStatus,
-} from "../../ui/components/agent-chat/index";
+} from "@cline/ui/components/agent-chat";
 import type { ReactNode } from "react";
 
 export interface AgentMessageView {
