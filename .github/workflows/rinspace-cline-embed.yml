@@ -1,0 +1,101 @@
+name: rinspace-cline-embed
+
+on:
+  pull_request:
+    branches:
+      - rinspace-sdk
+    paths:
+      - "sdk/packages/agents/**"
+      - "sdk/packages/cline-embed/**"
+      - "sdk/packages/ui/**"
+      - "scripts/rinspace/**"
+      - "NOTICE"
+      - "LICENSE"
+      - "bun.lock"
+      - ".github/workflows/rinspace-cline-embed.yml"
+  push:
+    branches:
+      - rinspace-sdk
+    paths:
+      - "sdk/packages/agents/**"
+      - "sdk/packages/cline-embed/**"
+      - "sdk/packages/ui/**"
+      - "scripts/rinspace/**"
+      - "NOTICE"
+      - "LICENSE"
+      - "bun.lock"
+      - ".github/workflows/rinspace-cline-embed.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rinspace-cline-embed-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cline-embed:
+    name: cline-embed
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.2"
+      - name: Install exact workspace dependencies
+        run: bun install --frozen-lockfile
+      - name: Build browser-hosted runtime and selected UI
+        run: |
+          bun -F @cline/agents build
+          bun -F @cline/ui build
+          bun -F @rinspacehq/cline-embed build
+      - name: Typecheck focused packages
+        run: |
+          bun -F @cline/agents typecheck
+          bun -F @rinspacehq/cline-embed typecheck
+      - name: Run focused tests serially
+        run: |
+          bun -F @cline/agents test --pool=forks --poolOptions.forks.singleFork=true
+          bun -F @rinspacehq/cline-embed test
+      - name: Pack and inspect browser artifact
+        run: |
+          mkdir -p "$RUNNER_TEMP/cline-embed-pack"
+          cd sdk/packages/cline-embed
+          bun pm pack --destination "$RUNNER_TEMP/cline-embed-pack"
+          tar -tzf "$RUNNER_TEMP"/cline-embed-pack/*.tgz | sort
+
+  DCO:
+    name: DCO
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Require Signed-off-by on every pull-request commit
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          status=0
+          while read -r commit; do
+            if ! git show -s --format=%B "$commit" | grep -qi '^Signed-off-by: .\+ <.\+>$'; then
+              echo "Missing Signed-off-by trailer: $commit"
+              status=1
+            fi
+          done < <(git rev-list --no-merges "$BASE_SHA..$HEAD_SHA")
+          exit "$status"
+
+  secret-scan:
+    name: secret-scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: node scripts/rinspace/scan-sensitive-inputs.mjs

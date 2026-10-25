@@ -652,6 +652,21 @@
         "nanoid": "^5.1.7",
       },
     },
+    "sdk/packages/cline-embed": {
+      "name": "@rinspacehq/cline-embed",
+      "version": "0.1.0-rinspace.1",
+      "devDependencies": {
+        "@cline/agents": "workspace:*",
+        "@cline/ui": "workspace:*",
+        "@types/react": "19.2.14",
+        "react": "19.2.4",
+        "typescript": "5.9.3",
+        "vitest": "^4.0.18",
+      },
+      "peerDependencies": {
+        "react": ">=18.3.0 <20",
+      },
+    },
     "sdk/packages/core": {
       "name": "@cline/core",
       "version": "0.0.95",
@@ -1103,6 +1118,8 @@
     "@cline/cline-hub": ["@cline/cline-hub@workspace:apps/cline-hub"],
 
     "@cline/cline-hub-webview": ["@cline/cline-hub-webview@workspace:apps/cline-hub/src/webview"],
+
+    "@rinspacehq/cline-embed": ["@rinspacehq/cline-embed@workspace:sdk/packages/cline-embed"],
 
     "@cline/code": ["@cline/code@workspace:apps/examples/desktop-app"],
 

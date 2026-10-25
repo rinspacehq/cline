@@ -1,0 +1,62 @@
+.rinspace-cline-embed {
+	--cline-ui-background: var(--rinspace-agent-background, var(--background));
+	--cline-ui-foreground: var(--rinspace-agent-foreground, var(--foreground));
+	--cline-ui-card: var(--rinspace-agent-surface, var(--card));
+	--cline-ui-border: var(--rinspace-agent-border, var(--border));
+	--cline-ui-input: var(--rinspace-agent-input, var(--input));
+	--cline-ui-primary: var(--rinspace-agent-primary, var(--primary));
+	--cline-ui-primary-foreground: var(
+		--rinspace-agent-primary-foreground,
+		var(--primary-foreground)
+	);
+	--cline-ui-secondary: var(--rinspace-agent-secondary, var(--secondary));
+	--cline-ui-muted-foreground: var(
+		--rinspace-agent-muted-foreground,
+		var(--muted-foreground)
+	);
+	--cline-ui-accent: var(--rinspace-agent-accent, var(--accent));
+	--cline-ui-accent-foreground: var(
+		--rinspace-agent-accent-foreground,
+		var(--accent-foreground)
+	);
+	--cline-ui-destructive: var(
+		--rinspace-agent-destructive,
+		var(--destructive)
+	);
+	--cline-ui-ring: var(--rinspace-agent-focus-ring, var(--ring));
+	--cline-ui-font-sans: var(--rinspace-agent-font-family, inherit);
+	--cline-ui-font-mono: var(--editor-font-family, ui-monospace, monospace);
+	--cline-ui-radius: var(--rinspace-agent-radius, var(--radius));
+	color: var(--cline-ui-foreground);
+	font-family: var(--cline-ui-font-sans);
+}
+
+.rinspace-cline-embed :focus-visible {
+	outline: 2px solid var(--cline-ui-ring);
+	outline-offset: 2px;
+}
+
+.rinspace-cline-embed .rinspace-cline-messages,
+.rinspace-cline-embed .cline-chat-conversation {
+	block-size: 100%;
+	min-block-size: 0;
+}
+
+.rinspace-cline-embed .cline-chat-conversation-viewport {
+	block-size: 100%;
+	overflow: auto;
+}
+
+.rinspace-cline-embed .cline-chat-message {
+	max-inline-size: 100%;
+	overflow-wrap: anywhere;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.rinspace-cline-embed *,
+	.rinspace-cline-embed *::before,
+	.rinspace-cline-embed *::after {
+		scroll-behavior: auto !important;
+		transition-duration: 0.01ms !important;
+	}
+}

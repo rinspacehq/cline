@@ -18,6 +18,15 @@ const builds: Parameters<typeof Bun.build>[0][] = [
 		packages: "bundle",
 		external,
 	},
+	{
+		entrypoints: ["./src/browser-host.ts"],
+		outdir: "./dist",
+		target: "browser",
+		minify,
+		sourcemap,
+		packages: "bundle",
+		external: ["nanoid"],
+	},
 ];
 
 for (const config of builds) {

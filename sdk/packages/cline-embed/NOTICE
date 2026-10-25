@@ -1,0 +1,11 @@
+@rinspacehq/cline-embed
+Copyright 2026 Rinspace contributors
+
+This product includes software developed by Cline Bot Inc. and Cline
+contributors from https://github.com/cline/cline, used under the Apache
+License, Version 2.0. The upstream source baseline is commit
+c718573538d76310f464541617ab665108a6c999, tagged sdk/agents/v0.0.95.
+
+The upstream baseline does not contain a root NOTICE file. This NOTICE records
+the derivative package attribution and does not replace or alter upstream
+copyright notices or the Apache-2.0 LICENSE.

@@ -1,0 +1,55 @@
+{
+	"name": "@rinspacehq/cline-embed",
+	"version": "0.1.0-rinspace.1",
+	"description": "Browser-only Cline Agent runtime and host-adaptable UI for Rinspace",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/rinspacehq/cline",
+		"directory": "sdk/packages/cline-embed"
+	},
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"browser": "./dist/index.js",
+			"import": "./dist/index.js"
+		},
+		"./ui": {
+			"types": "./dist/ui.d.ts",
+			"browser": "./dist/ui.js",
+			"import": "./dist/ui.js"
+		},
+		"./styles.css": "./styles.css",
+		"./package.json": "./package.json"
+	},
+	"files": [
+		"dist",
+		"styles.css",
+		"NOTICE",
+		"README.md"
+	],
+	"sideEffects": [
+		"./styles.css"
+	],
+	"peerDependencies": {
+		"react": ">=18.3.0 <20"
+	},
+	"devDependencies": {
+		"@cline/agents": "workspace:*",
+		"@cline/ui": "workspace:*",
+		"@types/react": "19.2.14",
+		"react": "19.2.4",
+		"typescript": "5.9.3",
+		"vitest": "^4.0.18"
+	},
+	"license": "Apache-2.0",
+	"scripts": {
+		"build": "bun run bun.mts && bun tsc -p tsconfig.build.json && bun run check:browser-boundary",
+		"check:browser-boundary": "bun scripts/check-browser-boundary.ts",
+		"test": "vitest run --config vitest.config.ts",
+		"typecheck": "bun tsc -p tsconfig.json --noEmit"
+	},
+	"engines": {
+		"node": ">=22"
+	}
+}
