@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 import {
-	AgentRuntime,
 	type AgentMessage,
 	type AgentModel,
 	type AgentModelEvent,
 	type AgentModelRequest,
+	AgentRuntime,
 	type AgentRuntimePlugin,
 	type AgentTool,
 } from "../src/index";
@@ -40,7 +40,9 @@ function toolCall(name: string): readonly AgentModelEvent[] {
 	];
 }
 
-function finishAfterTool(request: AgentModelRequest): readonly AgentModelEvent[] {
+function finishAfterTool(
+	request: AgentModelRequest,
+): readonly AgentModelEvent[] {
 	const message = request.messages.at(-1) as AgentMessage;
 	expect(message.role).toBe("tool");
 	return [
@@ -70,7 +72,9 @@ describe("browser-hosted runtime policy", () => {
 
 		expect(result.status).toBe("completed");
 		expect(execute).not.toHaveBeenCalled();
-		const toolMessage = result.messages.find((message) => message.role === "tool");
+		const toolMessage = result.messages.find(
+			(message) => message.role === "tool",
+		);
 		expect(toolMessage?.content[0]).toMatchObject({
 			isError: true,
 			output: { error: 'Tool "echo" is disabled by policy' },

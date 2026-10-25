@@ -15,15 +15,7 @@ const RATE_LIMIT_PATTERNS = [/rate[\s_-]?limit/i, /per[\s_-]?minute\b/i];
 const CONTEXT_WINDOW_STATUSES = new Set([400, 413, 422]);
 const AUTH_STATUSES = new Set([401, 403]);
 const RETRYABLE_STATUSES = new Set([
-	408,
-	409,
-	425,
-	429,
-	500,
-	502,
-	503,
-	504,
-	529,
+	408, 409, 425, 429, 500, 502, 503, 504, 529,
 ]);
 const PROVIDER_RETURNED_ERROR_PATTERN = /provider returned error/i;
 const MAX_WALK_DEPTH = 8;
@@ -101,7 +93,11 @@ function collectSignals(
 	}
 	for (const key of DETAIL_KEYS) {
 		const nested = record[key];
-		if (nested !== undefined && nested !== value && typeof nested !== "number") {
+		if (
+			nested !== undefined &&
+			nested !== value &&
+			typeof nested !== "number"
+		) {
 			collectSignals(nested, signals, visited, depth + 1);
 		}
 	}
@@ -140,9 +136,7 @@ export function classifyProviderError(error: unknown): ProviderErrorClass {
 	}
 	if (
 		signals.statuses.size > 0 &&
-		![...signals.statuses].some((status) =>
-			CONTEXT_WINDOW_STATUSES.has(status),
-		)
+		![...signals.statuses].some((status) => CONTEXT_WINDOW_STATUSES.has(status))
 	) {
 		return "unknown";
 	}

@@ -21,7 +21,9 @@ const packageJson = JSON.parse(
 	await readFile("sdk/packages/cline-embed/package.json", "utf8"),
 );
 if (tag !== `v${packageJson.version}`) {
-	throw new Error(`tag ${tag} does not match package version ${packageJson.version}`);
+	throw new Error(
+		`tag ${tag} does not match package version ${packageJson.version}`,
+	);
 }
 
 await mkdir(outputDir, { recursive: true });
@@ -119,7 +121,8 @@ const provenance = {
 	predicateType: "https://slsa.dev/provenance/v1",
 	predicate: {
 		buildDefinition: {
-			buildType: "https://github.com/rinspacehq/cline/rinspace-cline-embed-release/v1",
+			buildType:
+				"https://github.com/rinspacehq/cline/rinspace-cline-embed-release/v1",
 			externalParameters: { tag },
 			internalParameters: { repository, commit },
 			resolvedDependencies: [

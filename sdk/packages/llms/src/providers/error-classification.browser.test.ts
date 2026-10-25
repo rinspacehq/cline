@@ -6,9 +6,9 @@ import {
 
 describe("browser provider error classification", () => {
 	it("classifies structured auth and context errors", () => {
-		expect(classifyProviderError({ status: 401, message: "unauthorized" })).toBe(
-			"auth",
-		);
+		expect(
+			classifyProviderError({ status: 401, message: "unauthorized" }),
+		).toBe("auth");
 		expect(
 			classifyProviderError({
 				statusCode: 400,

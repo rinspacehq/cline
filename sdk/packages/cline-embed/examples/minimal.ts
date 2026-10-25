@@ -1,4 +1,4 @@
-import { AgentRuntime, type AgentModel } from "../src/index";
+import { type AgentModel, AgentRuntime } from "../src/index";
 
 const model: AgentModel = {
 	async stream() {

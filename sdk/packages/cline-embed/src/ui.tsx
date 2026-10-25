@@ -11,8 +11,8 @@ import {
 	MessageContent,
 	ToolActivity,
 	ToolActivityContent,
-	ToolActivityTrigger,
 	type ToolActivityStatus,
+	ToolActivityTrigger,
 } from "@cline/ui/components/agent-chat";
 import type { ReactNode } from "react";
 
@@ -50,11 +50,7 @@ export interface AgentToolViewProps {
 	status: ToolActivityStatus;
 }
 
-export function AgentToolView({
-	children,
-	label,
-	status,
-}: AgentToolViewProps) {
+export function AgentToolView({ children, label, status }: AgentToolViewProps) {
 	return (
 		<ToolActivity>
 			<ToolActivityTrigger label={label} status={status} />

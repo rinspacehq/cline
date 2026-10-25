@@ -27,8 +27,8 @@ export type {
 	AgentToolDefinition,
 	AgentToolResult,
 	AgentUsage,
-	ToolApprovalResult,
 	ToolApprovalRequest,
+	ToolApprovalResult,
 	ToolPolicy,
 } from "@cline/shared";
 export { createTool } from "@cline/shared";

@@ -24,7 +24,9 @@ try {
 		throw new Error(`Unexpected browser Agent status: ${status}`);
 	}
 	if (externalRequests.length > 0) {
-		throw new Error(`Unexpected external requests: ${externalRequests.join(", ")}`);
+		throw new Error(
+			`Unexpected external requests: ${externalRequests.join(", ")}`,
+		);
 	}
 } finally {
 	await browser.close();

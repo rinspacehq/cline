@@ -1,12 +1,12 @@
-import {
-	AgentRuntime as ClineAgentRuntime,
-	type AgentRuntimeConfig,
-} from "@cline/agents/browser-host";
 import type {
 	AgentBeforeToolResult,
 	AgentRuntimeHooks,
 	AgentTool,
 	ToolPolicy,
+} from "@cline/agents/browser-host";
+import {
+	type AgentRuntimeConfig,
+	AgentRuntime as ClineAgentRuntime,
 } from "@cline/agents/browser-host";
 
 export type {
@@ -38,7 +38,9 @@ export interface BrowserAgentRuntimeConfig
 	hooks?: AgentRuntimeHooks;
 }
 
-function assertUniqueTools(tools: readonly AgentTool[]): Map<string, AgentTool> {
+function assertUniqueTools(
+	tools: readonly AgentTool[],
+): Map<string, AgentTool> {
 	const allowed = new Map<string, AgentTool>();
 	for (const tool of tools) {
 		if (allowed.has(tool.name)) {

@@ -1,14 +1,9 @@
-import {
-	createGateway,
-	type GatewayProviderSettings,
-} from "@cline/llms";
+import { createGateway, type GatewayProviderSettings } from "@cline/llms";
 import type {
 	AgentModel,
 	AgentRuntimeConfig as BaseAgentRuntimeConfig,
 } from "@cline/shared";
-import {
-	AgentRuntime as HostedAgentRuntime,
-} from "./hosted-agent-runtime";
+import { AgentRuntime as HostedAgentRuntime } from "./hosted-agent-runtime";
 
 export {
 	type AgentEventListener,
