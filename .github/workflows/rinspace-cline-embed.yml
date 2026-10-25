@@ -48,6 +48,19 @@ jobs:
           bun-version: "1.4.2"
       - name: Install exact workspace dependencies
         run: bun install --frozen-lockfile
+      - name: Check changed SDK source style
+        run: |
+          bunx --bun @biomejs/biome check --diagnostic-level=error \
+            sdk/packages/agents/src/agent-runtime.ts \
+            sdk/packages/agents/src/browser-host.ts \
+            sdk/packages/agents/src/hosted-agent-runtime.ts \
+            sdk/packages/cline-embed/src \
+            sdk/packages/cline-embed/tests \
+            sdk/packages/cline-embed/examples \
+            sdk/packages/llms/src/error-classification.browser.ts \
+            sdk/packages/llms/src/providers/error-classification.browser.ts \
+            sdk/packages/llms/src/providers/error-classification.browser.test.ts \
+            scripts/rinspace
       - name: Build browser-hosted runtime and selected UI
         run: |
           bun -F @cline/shared build
@@ -64,6 +77,27 @@ jobs:
           bun -F @cline/llms test -- src/providers/error-classification.browser.test.ts
           bun -F @cline/agents test
           bun -F @rinspacehq/cline-embed test
+      - name: Run minimal example in Chromium
+        run: |
+          mkdir -p "$RUNNER_TEMP/cline-embed-example"
+          bun build sdk/packages/cline-embed/examples/minimal.ts \
+            --target browser \
+            --outfile "$RUNNER_TEMP/cline-embed-example/minimal.js"
+          cp sdk/packages/cline-embed/examples/index.html "$RUNNER_TEMP/cline-embed-example/"
+          bunx playwright install chromium
+          python3 -m http.server 4173 \
+            --bind 127.0.0.1 \
+            --directory "$RUNNER_TEMP/cline-embed-example" &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          for attempt in 1 2 3 4 5; do
+            if curl --fail --silent http://127.0.0.1:4173/ >/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          bun sdk/packages/cline-embed/examples/minimal.e2e.mjs \
+            http://127.0.0.1:4173/
       - name: Pack and inspect browser artifact
         run: |
           export SOURCE_DATE_EPOCH=$(git show -s --format=%ct HEAD)
