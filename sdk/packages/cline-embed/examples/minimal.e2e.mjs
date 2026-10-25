@@ -17,7 +17,8 @@ try {
 	await page.getByText("Browser runtime ready").waitFor();
 	const tool = page.getByRole("button", { name: "Compile project" });
 	await tool.waitFor();
-	await tool.click();
+	await tool.focus();
+	await page.keyboard.press("Enter");
 	await page.getByText("Compilation completed").waitFor();
 	await page.getByText("paper.tex").waitFor();
 	await page.getByText("+ Browser-safe change").waitFor();
