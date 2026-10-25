@@ -82,10 +82,11 @@ jobs:
       - name: Run minimal example in Chromium
         run: |
           mkdir -p "$RUNNER_TEMP/cline-embed-example"
-          bun build sdk/packages/cline-embed/examples/minimal.ts \
+          bun build sdk/packages/cline-embed/examples/minimal.tsx \
             --target browser \
             --outfile "$RUNNER_TEMP/cline-embed-example/minimal.js"
           cp sdk/packages/cline-embed/examples/index.html "$RUNNER_TEMP/cline-embed-example/"
+          cp sdk/packages/cline-embed/styles.css "$RUNNER_TEMP/cline-embed-example/"
           (cd sdk/packages/cline-embed && bunx playwright install chromium)
           python3 -m http.server 4173 \
             --bind 127.0.0.1 \
