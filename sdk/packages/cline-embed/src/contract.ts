@@ -176,10 +176,7 @@ export type AgentModelFinishReason =
 	| "aborted"
 	| "error";
 
-export type ProviderErrorClass =
-	| "context_window_exceeded"
-	| "auth"
-	| "unknown";
+export type ProviderErrorClass = "context_window_exceeded" | "auth" | "unknown";
 
 export type AgentModelEvent =
 	| { type: "text-delta"; text: string }
@@ -409,10 +406,7 @@ export interface CreateToolConfig<TInput, TOutput> {
 	resultPolicy?: AgentTool["resultPolicy"];
 	description: string;
 	inputSchema: Record<string, unknown>;
-	execute: (
-		input: TInput,
-		context: AgentToolContext,
-	) => Promise<TOutput>;
+	execute: (input: TInput, context: AgentToolContext) => Promise<TOutput>;
 	lifecycle?: AgentTool<TInput, TOutput>["lifecycle"];
 	executionMode?: AgentTool["executionMode"];
 	timeoutMs?: number;
