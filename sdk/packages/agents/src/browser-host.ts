@@ -18,6 +18,7 @@ export type {
 	AgentRunResult,
 	AgentRuntimeEvent,
 	AgentRuntimeHooks,
+	AgentRuntimePlugin,
 	AgentRuntimeStateSnapshot,
 	AgentStopControl,
 	AgentTool,

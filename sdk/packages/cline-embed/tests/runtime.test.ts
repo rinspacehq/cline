@@ -1,13 +1,13 @@
-import type {
-	AgentMessage,
-	AgentModel,
-	AgentModelEvent,
-	AgentModelRequest,
-	AgentRuntimePlugin,
-	AgentTool,
-} from "@cline/shared";
 import { describe, expect, it, vi } from "vitest";
-import { AgentRuntime } from "../src/index";
+import {
+	AgentRuntime,
+	type AgentMessage,
+	type AgentModel,
+	type AgentModelEvent,
+	type AgentModelRequest,
+	type AgentRuntimePlugin,
+	type AgentTool,
+} from "../src/index";
 
 class ScriptedModel implements AgentModel {
 	constructor(

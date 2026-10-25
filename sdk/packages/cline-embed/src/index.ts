@@ -18,6 +18,7 @@ export type {
 	AgentModelRequest,
 	AgentRunResult,
 	AgentRuntimeEvent,
+	AgentRuntimePlugin,
 	AgentRuntimeStateSnapshot,
 	AgentTool,
 	AgentToolContext,
