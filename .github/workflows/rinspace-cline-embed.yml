@@ -104,21 +104,23 @@ jobs:
       - name: Pack and inspect browser artifact
         run: |
           export SOURCE_DATE_EPOCH=$(git show -s --format=%ct HEAD)
+          version=$(node -p "require('./sdk/packages/cline-embed/package.json').version")
+          tag="v$version"
           mkdir -p "$RUNNER_TEMP/pack-a" "$RUNNER_TEMP/pack-b" "$RUNNER_TEMP/release"
           (cd sdk/packages/cline-embed && bun pm pack --destination "$RUNNER_TEMP/pack-a")
           (cd sdk/packages/cline-embed && bun pm pack --destination "$RUNNER_TEMP/pack-b")
           cmp "$RUNNER_TEMP"/pack-a/*.tgz "$RUNNER_TEMP"/pack-b/*.tgz
-          cp "$RUNNER_TEMP"/pack-a/*.tgz "$RUNNER_TEMP/release/cline-embed-v0.1.0-rinspace.1.tgz"
-          git archive --format=tar.gz --prefix="cline-v0.1.0-rinspace.1/" \
-            --output="$RUNNER_TEMP/release/cline-v0.1.0-rinspace.1-source.tar.gz" HEAD
+          cp "$RUNNER_TEMP"/pack-a/*.tgz "$RUNNER_TEMP/release/cline-embed-$tag.tgz"
+          git archive --format=tar.gz --prefix="cline-$tag/" \
+            --output="$RUNNER_TEMP/release/cline-$tag-source.tar.gz" HEAD
           cp LICENSE NOTICE "$RUNNER_TEMP/release/"
           node scripts/rinspace/package-cline-embed-release.mjs \
             --output "$RUNNER_TEMP/release" \
-            --package "$RUNNER_TEMP/release/cline-embed-v0.1.0-rinspace.1.tgz" \
-            --source "$RUNNER_TEMP/release/cline-v0.1.0-rinspace.1-source.tar.gz" \
-            --tag v0.1.0-rinspace.1
+            --package "$RUNNER_TEMP/release/cline-embed-$tag.tgz" \
+            --source "$RUNNER_TEMP/release/cline-$tag-source.tar.gz" \
+            --tag "$tag"
           (cd "$RUNNER_TEMP/release" && sha256sum --check SHA256SUMS)
-          tar -tzf "$RUNNER_TEMP/release/cline-embed-v0.1.0-rinspace.1.tgz" | sort
+          tar -tzf "$RUNNER_TEMP/release/cline-embed-$tag.tgz" | sort
       - uses: actions/upload-artifact@v4
         with:
           name: cline-embed-release-candidate

@@ -14,6 +14,9 @@ Import `@rinspacehq/cline-embed/styles.css` and set the `--rinspace-agent-*`
 custom properties on a `.rinspace-cline-embed` host element. The package does
 not load fonts or define a product palette.
 
+The release archive also carries a self-contained TypeScript host contract;
+consumers do not need unpublished `@cline/*` workspace declarations.
+
 `examples/minimal.ts` is built for a real browser and exercised in headless
 Chromium by the protected package workflow. The smoke test also rejects every
 request outside its local test origin.
