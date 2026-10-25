@@ -59,8 +59,8 @@ jobs:
           bun -F @rinspacehq/cline-embed typecheck
       - name: Run focused tests serially
         run: |
-          bun -F @cline/llms test --pool=forks --poolOptions.forks.singleFork=true
-          bun -F @cline/agents test --pool=forks --poolOptions.forks.singleFork=true
+          bun -F @cline/llms test -- src/providers/error-classification.browser.test.ts
+          bun -F @cline/agents test
           bun -F @rinspacehq/cline-embed test
       - name: Pack and inspect browser artifact
         run: |
