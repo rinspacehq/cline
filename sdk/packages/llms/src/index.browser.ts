@@ -68,6 +68,10 @@ export type {
 	ProviderId,
 } from "./providers.browser";
 export {
+	classifyProviderError,
+	isRetryableProviderError,
+} from "./providers/error-classification.browser";
+export {
 	ClineFreeModelLimitError,
 	ClineNotSubscribedError,
 	ClineOrgIndividualInferenceSubscriptionError,
