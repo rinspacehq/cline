@@ -19,6 +19,7 @@ const HOST_PROVIDED_SDK_SPECIFIERS = [
 	"@cline/core/telemetry",
 	"@cline/llms",
 	"@cline/llms/browser",
+	"@cline/llms/error-classification-browser",
 	"@cline/shared",
 	"@cline/shared/automation",
 	"@cline/shared/browser",
@@ -54,6 +55,10 @@ function collectWorkspaceAliases(root: string): Record<string, string> {
 		"@cline/agents": resolve(root, "packages/agents/src/index.ts"),
 		"@cline/core": resolve(root, "packages/core/src/index.ts"),
 		"@cline/llms": resolve(root, "packages/llms/src/index.ts"),
+		"@cline/llms/error-classification-browser": resolve(
+			root,
+			"packages/llms/src/error-classification-browser.ts",
+		),
 		"@cline/shared": resolve(root, "packages/shared/src/index.ts"),
 		"@cline/shared/storage": resolve(
 			root,
