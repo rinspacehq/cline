@@ -19,6 +19,7 @@ const forbiddenArtifactBytes = [
 	"createSpawnAgentTool",
 	"AgentTeamsRuntime",
 ];
+const forbiddenDeclarationImports = ["@cline/agents", "@cline/shared", "@cline/ui"];
 
 async function filesUnder(directory: string): Promise<string[]> {
 	const result: string[] = [];
@@ -43,11 +44,34 @@ for (const path of await filesUnder(join(root, "src"))) {
 }
 
 for (const path of await filesUnder(join(root, "dist"))) {
-	if (!path.endsWith(".js")) continue;
 	const text = await readFile(path, "utf8");
-	for (const token of forbiddenArtifactBytes) {
-		if (text.includes(token)) {
-			throw new Error(`${relative(root, path)} contains forbidden ${token}`);
+	if (path.endsWith(".js")) {
+		for (const token of forbiddenArtifactBytes) {
+			if (text.includes(token)) {
+				throw new Error(`${relative(root, path)} contains forbidden ${token}`);
+			}
 		}
+	}
+	if (path.endsWith(".d.ts")) {
+		for (const token of forbiddenDeclarationImports) {
+			if (text.includes(token)) {
+				throw new Error(
+					`${relative(root, path)} exposes unpublished declaration ${token}`,
+				);
+			}
+		}
+	}
+}
+
+const publicDeclaration = await readFile(join(root, "dist/index.d.ts"), "utf8");
+for (const signature of [
+	"run(input: AgentRunInput)",
+	"abort(reason?: unknown)",
+	"subscribe(listener: AgentEventListener)",
+	"restore(messages?:",
+	"snapshot(): AgentRuntimeStateSnapshot",
+]) {
+	if (!publicDeclaration.includes(signature)) {
+		throw new Error(`dist/index.d.ts is missing public runtime signature ${signature}`);
 	}
 }

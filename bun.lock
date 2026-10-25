@@ -654,7 +654,7 @@
     },
     "sdk/packages/cline-embed": {
       "name": "@rinspacehq/cline-embed",
-      "version": "0.1.0-rinspace.1",
+      "version": "0.1.0-rinspace.2",
       "devDependencies": {
         "@cline/agents": "workspace:*",
         "@cline/ui": "workspace:*",

@@ -11,10 +11,11 @@ import {
 	MessageContent,
 	ToolActivity,
 	ToolActivityContent,
-	type ToolActivityStatus,
 	ToolActivityTrigger,
 } from "@cline/ui/components/agent-chat";
 import type { ReactNode } from "react";
+
+export type ToolActivityStatus = "pending" | "running" | "success" | "error";
 
 export interface AgentMessageView {
 	id: string;
@@ -96,5 +97,3 @@ export interface AgentDiffPanelProps {
 export function AgentDiffPanel(props: AgentDiffPanelProps) {
 	return <ClineChangesPanel {...props} />;
 }
-
-export type { ToolActivityStatus };

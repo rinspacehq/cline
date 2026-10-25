@@ -1,42 +1,22 @@
+import {
+	AgentRuntime as ClineAgentRuntime,
+	AgentRuntimeAbortError as ClineAgentRuntimeAbortError,
+	createTool as createClineTool,
+} from "@cline/agents/browser-host";
 import type {
 	AgentBeforeToolResult,
-	AgentRuntimeHooks,
-	AgentTool,
-	ToolPolicy,
-} from "@cline/agents/browser-host";
-import {
-	type AgentRuntimeConfig,
-	AgentRuntime as ClineAgentRuntime,
-} from "@cline/agents/browser-host";
-
-export type {
-	AgentMessage,
-	AgentMessagePart,
-	AgentModel,
-	AgentModelEvent,
-	AgentModelFinishReason,
-	AgentModelRequest,
+	AgentEventListener,
+	AgentRunInput,
 	AgentRunResult,
-	AgentRuntimeEvent,
-	AgentRuntimePlugin,
+	AgentRuntimeHooks,
 	AgentRuntimeStateSnapshot,
 	AgentTool,
-	AgentToolContext,
-	AgentToolDefinition,
-	AgentToolResult,
-	AgentUsage,
-	ToolApprovalRequest,
-	ToolApprovalResult,
+	BrowserAgentRuntimeConfig,
+	CreateToolConfig,
 	ToolPolicy,
-} from "@cline/agents/browser-host";
-export { AgentRuntimeAbortError, createTool } from "@cline/agents/browser-host";
+} from "./contract";
 
-export interface BrowserAgentRuntimeConfig
-	extends Omit<AgentRuntimeConfig, "hooks" | "toolPolicies"> {
-	/** Named policies are opt-in. The wildcard policy is always forced off. */
-	toolPolicies?: Readonly<Record<string, Readonly<ToolPolicy>>>;
-	hooks?: AgentRuntimeHooks;
-}
+export type * from "./contract";
 
 function assertUniqueTools(
 	tools: readonly AgentTool[],
@@ -95,18 +75,48 @@ function composeBeforeTool(
  * API keys, custom URLs and headers are intentionally absent from the type and
  * runtime surface.
  */
-export class AgentRuntime extends ClineAgentRuntime {
+export class AgentRuntime {
+	readonly #runtime: ClineAgentRuntime;
+
 	constructor(config: BrowserAgentRuntimeConfig) {
 		const allowedTools = assertUniqueTools(config.tools ?? []);
 		const { hooks, toolPolicies, ...runtimeConfig } = config;
-		super({
+		this.#runtime = new ClineAgentRuntime({
 			...runtimeConfig,
 			hooks: {
 				...hooks,
 				beforeTool: composeBeforeTool(allowedTools, hooks?.beforeTool),
 			},
 			toolPolicies: createPolicies(allowedTools, toolPolicies),
-		});
+		} as never);
+	}
+
+	run(input: AgentRunInput): Promise<AgentRunResult> {
+		return this.#runtime.run(input as never) as Promise<AgentRunResult>;
+	}
+
+	continue(input?: AgentRunInput): Promise<AgentRunResult> {
+		return this.#runtime.continue(input as never) as Promise<AgentRunResult>;
+	}
+
+	notifyPendingUserMessage(): void {
+		this.#runtime.notifyPendingUserMessage();
+	}
+
+	abort(reason?: unknown): void {
+		this.#runtime.abort(reason);
+	}
+
+	subscribe(listener: AgentEventListener): () => void {
+		return this.#runtime.subscribe(listener as never);
+	}
+
+	restore(messages: BrowserAgentRuntimeConfig["initialMessages"] = []): void {
+		this.#runtime.restore(messages as never);
+	}
+
+	snapshot(): AgentRuntimeStateSnapshot {
+		return this.#runtime.snapshot() as AgentRuntimeStateSnapshot;
 	}
 }
 
@@ -120,3 +130,17 @@ export function createAgentRuntime(
 }
 
 export const createAgent = createAgentRuntime;
+
+export interface AgentRuntimeAbortError extends Error {
+	readonly reason?: unknown;
+}
+
+export const AgentRuntimeAbortError: new (
+	reason?: unknown,
+) => AgentRuntimeAbortError = ClineAgentRuntimeAbortError;
+
+export function createTool<TInput, TOutput>(
+	config: CreateToolConfig<TInput, TOutput>,
+): AgentTool<TInput, TOutput> {
+	return createClineTool(config as never) as AgentTool<TInput, TOutput>;
+}
