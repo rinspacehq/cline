@@ -15,6 +15,9 @@ try {
 	});
 	await page.goto(url, { waitUntil: "networkidle" });
 	await page.getByText("Browser runtime ready").waitFor();
+	const tool = page.getByRole("button", { name: "Compile project" });
+	await tool.waitFor();
+	await tool.click();
 	await page.getByText("Compilation completed").waitFor();
 	await page.getByText("paper.tex").waitFor();
 	await page.getByText("+ Browser-safe change").waitFor();
