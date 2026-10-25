@@ -1,6 +1,6 @@
 {
 	"name": "@rinspacehq/cline-embed",
-	"version": "0.1.0-rinspace.2",
+	"version": "0.1.0-rinspace.3",
 	"description": "Browser-only Cline Agent runtime and host-adaptable UI for Rinspace",
 	"repository": {
 		"type": "git",

@@ -18,6 +18,8 @@ const forbiddenArtifactBytes = [
 	"OPENROUTER_API_KEY",
 	"createSpawnAgentTool",
 	"AgentTeamsRuntime",
+	"react/jsx-dev-runtime",
+	"jsxDEV",
 ];
 const forbiddenDeclarationImports = ["@cline/agents", "@cline/shared", "@cline/ui"];
 
