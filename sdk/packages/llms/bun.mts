@@ -33,7 +33,7 @@ const builds: Parameters<typeof Bun.build>[0][] = [
 		entrypoints: [
 			"./src/index.browser.ts",
 			"./src/providers.browser.ts",
-			"./src/error-classification.browser.ts",
+			"./src/error-classification-browser.ts",
 		],
 		outdir: "./dist",
 		target: "browser",
