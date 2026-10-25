@@ -1,0 +1,69 @@
+name: rinspace-cline-embed-release
+
+on:
+  push:
+    tags:
+      - "v0.*-rinspace.*"
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify product branch and release version
+        run: |
+          git fetch origin rinspace-sdk
+          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/rinspace-sdk)"
+          version=$(node -p "require('./sdk/packages/cline-embed/package.json').version")
+          test "$GITHUB_REF_NAME" = "v$version"
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.2"
+      - name: Build exact browser package
+        run: |
+          bun install --frozen-lockfile
+          bun -F @cline/shared build
+          bun -F @cline/llms build
+          bun -F @cline/agents build
+          bun -F @cline/ui build
+          bun -F @rinspacehq/cline-embed build
+      - name: Reproducibly package release assets
+        run: |
+          export SOURCE_DATE_EPOCH=$(git show -s --format=%ct HEAD)
+          mkdir -p "$RUNNER_TEMP/pack-a" "$RUNNER_TEMP/pack-b" release
+          (cd sdk/packages/cline-embed && bun pm pack --destination "$RUNNER_TEMP/pack-a")
+          (cd sdk/packages/cline-embed && bun pm pack --destination "$RUNNER_TEMP/pack-b")
+          cmp "$RUNNER_TEMP"/pack-a/*.tgz "$RUNNER_TEMP"/pack-b/*.tgz
+          cp "$RUNNER_TEMP"/pack-a/*.tgz "release/cline-embed-${GITHUB_REF_NAME}.tgz"
+          git archive --format=tar.gz --prefix="cline-${GITHUB_REF_NAME}/" \
+            --output="release/cline-${GITHUB_REF_NAME}-source.tar.gz" HEAD
+          cp LICENSE NOTICE release/
+          node scripts/rinspace/package-cline-embed-release.mjs \
+            --output release \
+            --package "release/cline-embed-${GITHUB_REF_NAME}.tgz" \
+            --source "release/cline-${GITHUB_REF_NAME}-source.tar.gz" \
+            --tag "$GITHUB_REF_NAME"
+          (cd release && sha256sum --check SHA256SUMS)
+      - uses: actions/attest-build-provenance@v3
+        with:
+          subject-path: |
+            release/*.tgz
+            release/manifest.json
+            release/sbom.spdx.json
+      - name: Publish immutable GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" release/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "@rinspacehq/cline-embed $GITHUB_REF_NAME" \
+            --generate-notes \
+            --verify-tag
