@@ -231,6 +231,39 @@ export interface AgentModel {
 	) => AsyncIterable<AgentModelEvent> | Promise<AsyncIterable<AgentModelEvent>>;
 }
 
+export interface AgentBeforeModelContext {
+	snapshot: AgentRuntimeStateSnapshot;
+	request: AgentModelRequest;
+}
+
+export interface AgentBeforeModelResult {
+	stop?: boolean;
+	reason?: string;
+	messages?: readonly AgentMessage[];
+	tools?: readonly AgentToolDefinition[];
+	options?: Record<string, unknown>;
+}
+
+export interface AgentAfterModelContext {
+	snapshot: AgentRuntimeStateSnapshot;
+	assistantMessage: AgentMessage;
+	finishReason: AgentModelFinishReason;
+	requestId?: string;
+}
+
+export interface AgentStopControl {
+	stop?: boolean;
+	reason?: string;
+}
+
+export interface AgentRunLifecycleContext {
+	snapshot: AgentRuntimeStateSnapshot;
+}
+
+export interface AgentRunStartResult extends AgentStopControl {
+	appendContext?: string;
+}
+
 export interface AgentBeforeToolContext {
 	snapshot: AgentRuntimeStateSnapshot;
 	tool: AgentTool;
@@ -262,6 +295,24 @@ export interface AgentAfterToolResult {
 }
 
 export interface AgentRuntimeHooks {
+	beforeRun?: (
+		context: AgentRunLifecycleContext,
+	) =>
+		| AgentRunStartResult
+		| undefined
+		| Promise<AgentRunStartResult | undefined>;
+	afterRun?: (
+		context: AgentRunLifecycleContext & { result: AgentRunResult },
+	) => void | Promise<void>;
+	beforeModel?: (
+		context: AgentBeforeModelContext,
+	) =>
+		| AgentBeforeModelResult
+		| undefined
+		| Promise<AgentBeforeModelResult | undefined>;
+	afterModel?: (
+		context: AgentAfterModelContext,
+	) => AgentStopControl | undefined | Promise<AgentStopControl | undefined>;
 	beforeTool?: (
 		context: AgentBeforeToolContext,
 	) =>
@@ -374,6 +425,29 @@ export type AgentRuntimeEvent =
 
 export type AgentEventListener = (event: AgentRuntimeEvent) => void;
 
+export interface AgentRuntimePrepareTurnContext {
+	agentId: string;
+	conversationId?: string;
+	parentAgentId?: string | null;
+	iteration: number;
+	messages: readonly AgentMessage[];
+	systemPrompt?: string;
+	tools: readonly AgentToolDefinition[];
+	model: { id?: string; provider?: string; info?: unknown };
+	signal?: AbortSignal;
+	overflowRecovery?: boolean;
+	previousRequestInputTokens?: number;
+	emitStatusNotice?: (
+		message: string,
+		metadata?: Record<string, unknown>,
+	) => void;
+}
+
+export interface AgentRuntimePrepareTurnResult {
+	messages?: readonly AgentMessage[];
+	systemPrompt?: string;
+}
+
 export interface BrowserAgentRuntimeConfig {
 	model: AgentModel;
 	sessionId?: string;
@@ -395,6 +469,12 @@ export interface BrowserAgentRuntimeConfig {
 	requestToolApproval?: (
 		request: ToolApprovalRequest,
 	) => Promise<ToolApprovalResult> | ToolApprovalResult;
+	prepareTurn?: (
+		context: AgentRuntimePrepareTurnContext,
+	) =>
+		| AgentRuntimePrepareTurnResult
+		| undefined
+		| Promise<AgentRuntimePrepareTurnResult | undefined>;
 	consumePendingUserMessage?: () =>
 		| string
 		| undefined
