@@ -15,6 +15,9 @@ try {
 	});
 	await page.goto(url, { waitUntil: "networkidle" });
 	await page.getByText("Browser runtime ready").waitFor();
+	await page.getByText("Compilation completed").waitFor();
+	await page.getByText("paper.tex").waitFor();
+	await page.getByText("+ Browser-safe change").waitFor();
 	const status = await page.locator("html").getAttribute("data-agent-status");
 	if (status !== "completed") {
 		throw new Error(`Unexpected browser Agent status: ${status}`);

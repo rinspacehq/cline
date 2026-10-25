@@ -82,7 +82,7 @@ jobs:
       - name: Run minimal example in Chromium
         run: |
           mkdir -p "$RUNNER_TEMP/cline-embed-example"
-          bun build sdk/packages/cline-embed/examples/minimal.tsx \
+          NODE_ENV=production bun build sdk/packages/cline-embed/examples/minimal.tsx \
             --target browser \
             --outfile "$RUNNER_TEMP/cline-embed-example/minimal.js"
           cp sdk/packages/cline-embed/examples/index.html "$RUNNER_TEMP/cline-embed-example/"

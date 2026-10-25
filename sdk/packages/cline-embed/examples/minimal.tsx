@@ -1,12 +1,12 @@
 import { createRoot } from "react-dom/client";
-import { type AgentModel, AgentRuntime } from "../src/index";
+import { type AgentModel, AgentRuntime } from "../dist/index.js";
 import {
 	AgentApprovalCard,
 	AgentDiffFile,
 	AgentDiffPanel,
 	AgentMessageList,
 	AgentToolView,
-} from "../src/ui";
+} from "../dist/ui.js";
 
 const model: AgentModel = {
 	async stream() {
